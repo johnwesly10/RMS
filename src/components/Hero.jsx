@@ -1,5 +1,7 @@
 import { Check, ArrowRight } from "lucide-react";
 import heroImage from "../assets/hero-shipyard.jpg";
+import { Link } from "react-router-dom";
+
 
 const features = [
   "Advanced Maintenance Programs",
@@ -40,14 +42,26 @@ const Hero = () => {
             ))}
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4">
-            <button className="bg-white text-blue-900 hover:bg-gray-100 font-medium px-8 py-3 rounded-md flex items-center justify-center transition-colors">
-              Our Services <ArrowRight className="w-4 h-4 ml-2" />
-            </button>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 py-3 rounded-md flex items-center justify-center transition-colors border border-white/20">
-              Contact us <ArrowRight className="w-4 h-4 ml-2" />
-            </button>
-          </div>
+        <div className="flex flex-col sm:flex-row gap-4">
+  <Link
+    to="/services"
+    className="bg-white text-blue-900 hover:bg-gray-100 font-medium px-8 py-3 rounded-md
+               flex items-center justify-center transition-colors"
+  >
+    Our Services
+    <ArrowRight className="w-4 h-4 ml-2" />
+  </Link>
+
+  <Link
+    to="/contact"
+    className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 py-3 rounded-md
+               flex items-center justify-center transition-colors border border-white/20"
+  >
+    Contact Us
+    <ArrowRight className="w-4 h-4 ml-2" />
+  </Link>
+</div>
+
         </div>
       </div>
 

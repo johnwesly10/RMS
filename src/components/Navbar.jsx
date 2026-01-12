@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Menu, X, ArrowRight } from "lucide-react";
-
+import { Link } from "react-router-dom";
 const navLinks = [
   { name: "Home", href: "/" },
-  { name: "Services", href: "#services" },
+  { name: "Services", href: "service" },
   { name: "Gallery", href: "#gallery" },
-  { name: "Contact Us", href: "#contact" },
-  { name: "Our Reach", href: "#reach" },
+  { name: "Contact Us", href: "contact" },
+  { name: "Our Reach", href: "our reach" },
 ];
 
 const Navigation = () => {
@@ -43,11 +43,19 @@ const Navigation = () => {
           </div>
 
           {/* CTA Button */}
+        
           <div className="hidden md:block">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md flex items-center transition-colors">
-              Enquire Now <ArrowRight className="w-4 h-4 ml-2" />
-            </button>
-          </div>
+  <Link
+    to="/enquiry"
+    className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2
+               rounded-md flex items-center transition-colors"
+  >
+    Enquire Now
+    <ArrowRight className="w-4 h-4 ml-2" />
+  </Link>
+</div>
+
+          
 
           {/* Mobile menu button */}
           <div className="md:hidden">

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
+
+
 import TopBar from "./components/TopBar";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
@@ -9,6 +11,10 @@ import About from "./components/About";
 import Testimonials from "./components/Testimonials";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
+import ServicesMain from "./components/ServicesMain";
+import ContactMain from "./components/ContactMain"
+import OurReach from './components/OurReach';
+import Enquiry from "./components/Enquiry";
 
 function App() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -44,9 +50,13 @@ function App() {
             <Route path="/services" element={<Services />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
+             <Route path="/service" element={<ServicesMain />} />
+             <Route path="/contactus" element={<ContactMain />} />
+             <Route path="/our reach" element={<OurReach />} />
+            <Route path="/enquiry" element={<Enquiry />} />
           </Routes>
         </main>
-        
+         
         <Footer />
       </div>
     </Router>
