@@ -6,24 +6,25 @@ const Footer = () => {
   
   const quickLinks = [
     { name: "Home", href: "/" },
-    { name: "Services", href: "service" },
+    { name: "Services", href: "/serviceMain" },
     { name: "About Us", href: "#about" },
-    { name: "Contact", href: "contact" },
-    { name: "Our Reach", href: "our reach" },
+    { name: "Contact", href: "/contact" },
+    { name: "Our Reach", href: "/ourReach" },
   ];
 
   const services = [
-    { name: "Engine Maintenance", href: "#" },
-    { name: "Repair Services", href: "#" },
-    { name: "Safety Inspections", href: "#" },
-    { name: "Docking Services", href: "#" },
-    { name: "Technical Support", href: "#" },
+    { name: "Ship Repair", href: "/services/ship-repair" },
+    { name: "Dry Docking", href: "/services/dry-docking" },
+    { name: "Marine Electrical", href: "/services/marine-electrical" },
+    { name: "Marine Automation", href: "/services/marine-automation" },
+    { name: "Harbor Services", href: "/services/harbor-services" },
+    { name: "Port Agency", href: "/services/port-agency" },
   ];
 
   return (
     <footer className="bg-gray-900 text-gray-300 pt-16 pb-8">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-12 mb-12">
           {/* Company Info */}
           <div>
             <div className="flex items-center mb-6">
@@ -62,9 +63,8 @@ const Footer = () => {
                 <li key={index}>
                   <a 
                     href={link.href} 
-                    className="text-gray-400 hover:text-white transition-colors flex items-center"
+                    className="text-gray-400 hover:text-white transition-colors"
                   >
-                    <span className="w-1.5 h-1.5 bg-blue-600 rounded-full mr-2"></span>
                     {link.name}
                   </a>
                 </li>
@@ -80,9 +80,8 @@ const Footer = () => {
                 <li key={index}>
                   <a 
                     href={service.href} 
-                    className="text-gray-400 hover:text-white transition-colors flex items-center"
+                    className="text-gray-400 hover:text-white transition-colors"
                   >
-                    <span className="w-1.5 h-1.5 bg-blue-600 rounded-full mr-2"></span>
                     {service.name}
                   </a>
                 </li>

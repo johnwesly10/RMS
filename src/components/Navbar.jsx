@@ -3,10 +3,10 @@ import { Menu, X, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 const navLinks = [
   { name: "Home", href: "/" },
-  { name: "Services", href: "service" },
+  { name: "Services", href: "/serviceMain" },
   { name: "Gallery", href: "#gallery" },
-  { name: "Contact Us", href: "contact" },
-  { name: "Our Reach", href: "our reach" },
+  { name: "Contact Us", href: "/contact" },
+  { name: "Our Reach", href: "/ourReach" },
 ];
 
 const Navigation = () => {
@@ -32,30 +32,28 @@ const Navigation = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
-                href={link.href}
+                to={link.href}
                 className="text-gray-700 hover:text-blue-600 font-medium text-sm transition-colors"
               >
                 {link.name}
-              </a>
+              </Link>
             ))}
           </div>
 
           {/* CTA Button */}
-        
-          <div className="hidden md:block">
-  <Link
-    to="/enquiry"
-    className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2
-               rounded-md flex items-center transition-colors"
-  >
-    Enquire Now
-    <ArrowRight className="w-4 h-4 ml-2" />
-  </Link>
-</div>
 
-          
+          <div className="hidden md:block">
+            <Link
+              to="/enquiry"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2
+               rounded-md flex items-center transition-colors"
+            >
+              Enquire Now
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Link>
+          </div>
 
           {/* Mobile menu button */}
           <div className="md:hidden">
@@ -72,14 +70,14 @@ const Navigation = () => {
         {isOpen && (
           <div className="md:hidden py-4 space-y-4 bg-white border-t border-gray-200">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
-                href={link.href}
+                to={link.href}
                 className="block py-2 px-4 text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
                 onClick={() => setIsOpen(false)}
               >
                 {link.name}
-              </a>
+              </Link>
             ))}
             <div className="pt-2">
               <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md flex items-center justify-center transition-colors">

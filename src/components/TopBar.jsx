@@ -2,8 +2,8 @@ import { Phone, Mail, Clock, Twitter, Facebook, Instagram } from "lucide-react";
 
 const TopBar = () => {
   return (
-    <div className="bg-blue-900 text-white py-2 px-4">
-      <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+    <div className="bg-blue-800 text-white text-sm py-2 hidden md:block">
+      <div className="container mx-auto px-4 flex justify-between items-center">
         {/* Contact Info */}
         <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 text-sm">
           <div className="flex items-center gap-2">
