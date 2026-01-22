@@ -1,69 +1,67 @@
-import { Anchor, Settings, Shield, Wrench } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Wrench, Anchor, Zap, Settings, Ship, Briefcase } from "lucide-react";
 
 const services = [
   {
-    icon: <Settings className="w-10 h-10 text-blue-600" />,
-    title: "Engine Maintenance",
-    description:
-      "Comprehensive maintenance services to keep your marine engines running at peak performance.",
-    link: "/services/engine-maintenance",
+    icon: <Wrench className="w-8 h-8" />,
+    title: "Ship Repair",
+    description: "Comprehensive repair and maintenance services for all types of vessels, ensuring safety and reliability at sea.",
   },
   {
-    icon: <Wrench className="w-10 h-10 text-blue-600" />,
-    title: "Repair Services",
-    description:
-      "Expert repair solutions for all types of marine equipment and systems.",
-    link: "/services/repairs",
+    icon: <Anchor className="w-8 h-8" />,
+    title: "Dry Docking",
+    description: "Professional dry docking services including hull cleaning, painting, and underwater repairs.",
   },
   {
-    icon: <Shield className="w-10 h-10 text-blue-600" />,
-    title: "Safety Inspections",
-    description:
-      "Thorough safety inspections to ensure compliance with maritime regulations.",
-    link: "/services/safety",
+    icon: <Zap className="w-8 h-8" />,
+    title: "Marine Electrical",
+    description: "Expert installation and maintenance of marine electrical systems and navigation equipment.",
   },
   {
-    icon: <Anchor className="w-10 h-10 text-blue-600" />,
-    title: "Docking Services",
-    description:
-      "Complete docking solutions including hull cleaning, painting, and maintenance.",
-    link: "/services/docking",
+    icon: <Settings className="w-8 h-8" />,
+    title: "Marine Automation",
+    description: "Advanced automation solutions for modern vessels to enhance operational efficiency.",
+  },
+  {
+    icon: <Ship className="w-8 h-8" />,
+    title: "Harbor Services",
+    description: "Comprehensive harbor support including berthing, mooring, and cargo handling.",
+  },
+  {
+    icon: <Briefcase className="w-8 h-8" />,
+    title: "Port Agency",
+    description: "Efficient port agency services ensuring smooth operations and regulatory compliance.",
   },
 ];
 
 const Services = () => {
   return (
-    <section id="services" className="py-20 bg-gray-50">
-      <div className="container mx-auto px-4">
-        {/* Section Header */}
+    <section id="services" className="py-16 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Our Services
+          <span className="text-sm font-semibold tracking-wider text-blue-600 uppercase">What We Offer</span>
+          <h2 className="mt-2 text-3xl font-extrabold text-gray-900 sm:text-4xl">
+            Our Marine Services
           </h2>
-          <div className="w-20 h-1 bg-blue-600 mx-auto"></div>
+          <div className="mt-3 max-w-2xl mx-auto text-xl text-gray-500">
+            Comprehensive solutions for all your maritime needs
+          </div>
         </div>
 
-        {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
           {services.map((service, index) => (
-            <Link
+            <div 
               key={index}
-              to={service.link}
-              className="bg-white p-8 rounded-lg shadow-md text-center
-                         hover:shadow-xl hover:-translate-y-1 transition-all duration-300
-                         focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="relative bg-white p-6 rounded-lg border border-gray-200 hover:border-blue-300 transition-all duration-300 group"
             >
-              <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="absolute -top-6 left-6 w-14 h-14 rounded-lg bg-blue-600 text-white flex items-center justify-center transform group-hover:rotate-6 transition-transform duration-300">
                 {service.icon}
               </div>
-
-              <h3 className="text-xl font-semibold mb-3 text-gray-900">
-                {service.title}
-              </h3>
-
-              <p className="text-gray-600">{service.description}</p>
-            </Link>
+              <div className="pt-8">
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{service.title}</h3>
+                <p className="text-gray-600 leading-relaxed">{service.description}</p>
+              </div>
+              
+            </div>
           ))}
         </div>
       </div>

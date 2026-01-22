@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 
-
 import TopBar from "./components/TopBar";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
@@ -18,9 +17,10 @@ import Testimonials from "./components/Testimonials";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import ServicesMain from "./components/ServicesMain";
-import ContactMain from "./components/ContactMain"
+import ContactMain from "./components/ContactMain";
 import OurReach from './components/OurReach';
 import Enquiry from "./components/Enquiry";
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -43,30 +43,32 @@ function App() {
         </header>
         
         <main className="grow">
-          <Routes>
-            <Route path="/" element={
-              <>
-                <Hero />
-                <Services />
-                <About />
-                <Testimonials />
-                <Contact />
-              </>
-            } />
-            <Route path="/services" element={<Services />} />
-            <Route path="/services/ship-repair" element={<ShipRepair />} />
-            <Route path="/services/dry-docking" element={<DryDocking />} />
-            <Route path="/services/marine-electrical" element={<MarineElectrical />} />
-            <Route path="/services/marine-automation" element={<MarineAutomation />} />
-            <Route path="/services/harbor-services" element={<HarborServices />} />
-            <Route path="/services/port-agency" element={<PortAgency />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/serviceMain" element={<ServicesMain />} />
-            <Route path="/contactus" element={<ContactMain />} />
-            <Route path="/ourReach" element={<OurReach />} />
-            <Route path="/enquiry" element={<Enquiry />} />
-          </Routes>
+          <ScrollToTop>
+            <Routes>
+              <Route path="/" element={
+                <>
+                  <Hero />
+                  <Services />
+                  <About />
+                  <Testimonials />
+                  <Contact />
+                </>
+              } />
+              <Route path="/services" element={<Services />} />
+              <Route path="/services/ship-repair" element={<ShipRepair />} />
+              <Route path="/services/dry-docking" element={<DryDocking />} />
+              <Route path="/services/marine-electrical" element={<MarineElectrical />} />
+              <Route path="/services/marine-automation" element={<MarineAutomation />} />
+              <Route path="/services/harbor-services" element={<HarborServices />} />
+              <Route path="/services/port-agency" element={<PortAgency />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/serviceMain" element={<ServicesMain />} />
+              <Route path="/contactus" element={<ContactMain />} />
+              <Route path="/ourReach" element={<OurReach />} />
+              <Route path="/enquiry" element={<Enquiry />} />
+            </Routes>
+          </ScrollToTop>
         </main>
          
         <Footer />

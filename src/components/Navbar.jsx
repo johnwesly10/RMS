@@ -15,18 +15,27 @@ const Navigation = () => {
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <div className="flex items-center">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mr-3">
-                <span className="text-white font-bold text-xl">⚓</span>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">Rehoboth Marine</h1>
-                <p className="text-sm text-gray-600">Equipment & Services</p>
-              </div>
-            </div>
+        <div className="flex items-center justify-between  h-20">
+          {/* Logo and Company Name */}
+          <div className="flex items-center space-x-4">
+            <Link to="/" className="flex items-center">
+              {/* Logo Image */}
+              <img 
+                src="/src/assets/company-logo.jpeg" 
+                alt="Rehoboth Marine Logo" 
+                className="h-14 w-auto object-contain"
+              />
+              
+              {/* Company Name Image - Add your company name image here */}
+              
+                <img 
+                  src="/src/assets/company-name.jpeg" 
+                  alt="Rehoboth Marine" 
+                  className="h-14 w-auto object-contain"
+                />
+               
+              
+            </Link>
           </div>
 
           {/* Desktop Navigation */}
