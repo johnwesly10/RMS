@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import companyLogo from "../assets/company-logo.jpeg";
+import companyName from "../assets/company-name.jpeg";  
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "Services", href: "/serviceMain" },
@@ -21,7 +23,7 @@ const Navigation = () => {
             <Link to="/" className="flex items-center">
               {/* Logo Image */}
               <img 
-                src="/src/assets/company-logo.jpeg" 
+                src={companyLogo}
                 alt="Rehoboth Marine Logo" 
                 className="h-14 w-auto object-contain"
               />
@@ -29,7 +31,7 @@ const Navigation = () => {
               {/* Company Name Image - Add your company name image here */}
               
                 <img 
-                  src="/src/assets/company-name.jpeg" 
+                  src={companyName}
                   alt="Rehoboth Marine" 
                   className="h-14 w-auto object-contain"
                 />

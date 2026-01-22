@@ -53,7 +53,7 @@ const Services = () => {
               key={index}
               className="relative bg-white p-6 rounded-lg border border-gray-200 hover:border-blue-300 transition-all duration-300 group"
             >
-              <div className="absolute -top-6 left-6 w-14 h-14 rounded-lg bg-blue-600 text-white flex items-center justify-center transform group-hover:rotate-6 transition-transform duration-300">
+              <div className="absolute -top-6 left-6 w-14 h-14 rounded-lg bg-[#C9A24D] text-white flex items-center justify-center transform group-hover:rotate-6 transition-transform duration-300">
                 {service.icon}
               </div>
               <div className="pt-8">
