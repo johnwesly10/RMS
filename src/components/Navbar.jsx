@@ -16,7 +16,7 @@ const Navigation = () => {
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-5">
         <div className="flex items-center justify-between  h-20">
           {/* Logo and Company Name */}
           <div className="flex items-center space-x-4">
@@ -25,16 +25,17 @@ const Navigation = () => {
               <img 
                 src={companyLogo}
                 alt="Rehoboth Marine Logo" 
-                className="h-14 w-auto object-contain"
+                className="h-16 w-auto object-contain"
               />
               
-              {/* Company Name Image - Add your company name image here */}
-              
+              {/* Company Name Image */}
+              <div className="ml-6">
                 <img 
                   src={companyName}
                   alt="Rehoboth Marine" 
-                  className="h-14 w-auto object-contain"
+                  className="h-16 w-auto object-contain"
                 />
+              </div>
                
               
             </Link>
@@ -46,7 +47,7 @@ const Navigation = () => {
               <Link
                 key={link.name}
                 to={link.href}
-                className="text-gray-700 hover:text-blue-600 font-medium text-sm transition-colors"
+                className="text-gray-700 hover:[#F2B705]font-medium text-sm transition-colors"
               >
                 {link.name}
               </Link>
@@ -58,7 +59,7 @@ const Navigation = () => {
           <div className="hidden md:block">
             <Link
               to="/enquiry"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2
+              className="bg-[#F2B705] hover:bg-[#6B3E1E] text-white font-medium px-6 py-2
                rounded-md flex items-center transition-colors"
             >
               Enquire Now
@@ -70,7 +71,7 @@ const Navigation = () => {
           <div className="md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-700 hover:text-blue-600"
+              className="text-gray-700 hover:text-[#F2B705]"
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -91,7 +92,7 @@ const Navigation = () => {
               </Link>
             ))}
             <div className="pt-2">
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md flex items-center justify-center transition-colors">
+              <button className="w-full bg-[#e1ae14] hover:bg-[#6B3E1E] text-white font-medium px-6 py-2 rounded-md flex items-center justify-center transition-colors">
                 Enquire Now <ArrowRight className="w-4 h-4 ml-2" />
               </button>
             </div>
