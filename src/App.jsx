@@ -36,7 +36,6 @@ function App() {
 
   return (
     <Router>
-      <div className="flex flex-col min-h-screen overflow-x-hidden w-full">
         <TopBar />
         <header className={`sticky top-0 z-50 transition-shadow ${isScrolled ? 'shadow-md' : ''}`}>
           <Navbar />
@@ -72,7 +71,6 @@ function App() {
         </main>
          
         <Footer />
-      </div>
     </Router>
   );
 }
