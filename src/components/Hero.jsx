@@ -52,6 +52,7 @@ const Hero = () => {
               <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-2" />
             </Link>
 
+<<<<<<< HEAD
             <Link
               to="/contact"
               className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 sm:px-8 py-2.5 sm:py-3 rounded-md
@@ -61,6 +62,19 @@ const Hero = () => {
               <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-2" />
             </Link>
           </div>
+=======
+  <Link
+    to="/contact"
+    className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 py-3 rounded-md
+               flex items-center justify-center transition-colors border border-white/20"
+  >
+    Contact Us
+    <ArrowRight className="w-4 h-4 ml-2" />
+  </Link>
+
+  
+</div>
+>>>>>>> 9f14e13 (new update)
 
         </div>
       </div>

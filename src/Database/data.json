@@ -1,0 +1,39 @@
+{
+  "Admin": [
+    {
+      "id": "7a19",
+      "email": "anu@gmail.com",
+      "password": "1234"
+    }
+  ],
+  "project": [
+    {
+      "id": "8e5b",
+      "title": "marine System",
+      "category": "Education",
+      "location": "bangloare",
+      "shortDescription": "it is very helpfull project jakcsvkhg",
+      "fullStory": "smndcghjgfcfdtuijhbvcfg bnvhcgcgvvvgvgvvhjhgdcvhyfdcvguytdxgtfc",
+      "problemSolved": "",
+      "impactPeople": "",
+      "status": "Ongoing",
+      "imageUrl": "https://img.freepik.com/premium-photo/thriving-underwater-coral-reef-teeming-with-colorful-marine-life-illuminated-by-sunbeams_674594-5163.jpg?w=2000",
+      "isPublished": true,
+      "isFeatured": false
+    },
+    {
+      "id": "151a",
+      "title": "marine educ",
+      "category": "Education",
+      "location": "dubhai",
+      "shortDescription": "sawlkfhkHQGVKI",
+      "fullStory": "AS.,KVNIuwhfoiHQ;",
+      "problemSolved": "",
+      "impactPeople": "",
+      "status": "Ongoing",
+      "imageUrl": "https://i.pinimg.com/originals/78/56/fc/7856fcc3b982a44e420b60f301987107.jpg",
+      "isPublished": true,
+      "isFeatured": true
+    }
+  ]
+}
