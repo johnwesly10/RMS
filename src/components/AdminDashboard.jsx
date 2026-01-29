@@ -1,304 +1,142 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Users, LayoutDashboard, FileText, Plus, Trash2, Edit } from "lucide-react";
+import { Users, LayoutDashboard, FileText, Plus, Trash2, Edit, Lock, Unlock } from "lucide-react";
 
 function AdminDashboard() {
   const [view, setView] = useState("dashboard");
-  const [users, setUsers] = useState([]);
-  const [posts, setPosts] = useState([]);
+  const [admins, setAdmins] = useState([]);
+  const [postingUsers, setPostingUsers] = useState([]);
+  const [projects, setProjects] = useState([]);
 
-  // --- Form States ---
-  const [newUser, setNewUser] = useState({ email: "", password: "" });
-  const [newPost, setNewPost] = useState({ title: "", description: "", imageUrl: "" });
+  // Admin States
+  const [newAdmin, setNewAdmin] = useState({ email: "", password: "", phone: "", documentUrl: "" });
+  const [editingAdminId, setEditingAdminId] = useState(null);
+  const [editAdminData, setEditAdminData] = useState({ email: "", password: "", phone: "", documentUrl: "" });
 
-  // --- Edit States ---
-  const [editingUserId, setEditingUserId] = useState(null);
-  const [editUserData, setEditUserData] = useState({ email: "", password: "" });
+  // Posting User States
+  const [newPostingUser, setNewPostingUser] = useState({ username: "", password: "", phone: "", documentUrl: "", blocked: false });
+  const [editingPostingUserId, setEditingPostingUserId] = useState(null);
+  const [editPostingUserData, setEditPostingUserData] = useState({ username: "", password: "", phone: "", documentUrl: "", blocked: false });
 
-  const [editingPostId, setEditingPostId] = useState(null);
-  const [editPostData, setEditPostData] = useState({ title: "", description: "", imageUrl: "" });
-
-  // --- Fetch Data ---
-  const fetchData = async () => {
-    try {
-      const userRes = await axios.get("http://localhost:1000/Admin");
-      const postRes = await axios.get("http://localhost:1000/Posts");
-      setUsers(userRes.data);
-      setPosts(postRes.data);
-    } catch (err) {
-      console.error("Error fetching data", err);
-    }
-  };
-
+  // Fetch data (Strict Mode safe)
   useEffect(() => {
-    fetchData();
+    const controller = new AbortController();
+
+    const fetchDataAsync = async () => {
+      try {
+        const [adminRes, postingUserRes, projectRes] = await Promise.all([
+          axios.get("http://localhost:1000/Admin", { signal: controller.signal }),
+          axios.get("http://localhost:1000/PostingUsers", { signal: controller.signal }),
+          axios.get("http://localhost:1000/project", { signal: controller.signal }),
+        ]);
+        setAdmins(adminRes.data);
+        setPostingUsers(postingUserRes.data);
+        setProjects(projectRes.data);
+      } catch (err) {
+        if (err.name !== "CanceledError") console.error(err);
+      }
+    };
+
+    fetchDataAsync();
+    return () => controller.abort();
   }, []);
 
-  // --- USER ACTIONS ---
-  const handleAddUser = async (e) => {
+  // --- Admin Actions ---
+  const handleAddAdmin = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:1000/Admin", newUser);
-      toast.success("User added successfully");
-      setNewUser({ email: "", password: "" });
+      await axios.post("http://localhost:1000/Admin", newAdmin);
+      toast.success("Admin added");
+      setNewAdmin({ email: "", password: "", phone: "", documentUrl: "" });
       fetchData();
-    } catch (err) {
-      toast.error("Failed to add user");
-      console.log(err);
+    } catch {
+      toast.error("Failed to add admin");
     }
   };
+  const startEditAdmin = (a) => { setEditingAdminId(a.id); setEditAdminData(a); };
+  const saveEditAdmin = async () => { await axios.put(`http://localhost:1000/Admin/${editingAdminId}`, editAdminData); toast.success("Admin updated"); setEditingAdminId(null); fetchData(); };
+  const deleteAdmin = async (id) => { if (window.confirm("Delete this admin?")) { await axios.delete(`http://localhost:1000/Admin/${id}`); toast.info("Removed"); fetchData(); } };
 
-  const deleteUser = async (id) => {
-    if (window.confirm("Delete this admin?")) {
-      await axios.delete(`http://localhost:1000/Admin/${id}`);
-      fetchData();
-      toast.info("User removed");
-    }
+  // --- Posting User Actions ---
+  const handleAddPostingUser = async (e) => { e.preventDefault(); try { await axios.post("http://localhost:1000/PostingUsers", newPostingUser); toast.success("User added"); setNewPostingUser({ username: "", password: "", phone: "", documentUrl: "", blocked: false }); fetchData(); } catch { toast.error("Failed"); } };
+  const startEditPostingUser = (u) => { setEditingPostingUserId(u.id); setEditPostingUserData(u); };
+  const saveEditPostingUser = async () => { await axios.put(`http://localhost:1000/PostingUsers/${editingPostingUserId}`, editPostingUserData); toast.success("User updated"); setEditingPostingUserId(null); fetchData(); };
+  const deletePostingUser = async (id) => { if (window.confirm("Delete this user?")) { await axios.delete(`http://localhost:1000/PostingUsers/${id}`); toast.info("Removed"); fetchData(); } };
+  const toggleBlockUser = async (user) => { await axios.put(`http://localhost:1000/PostingUsers/${user.id}`, { ...user, blocked: !user.blocked }); toast.info(user.blocked ? "Unblocked" : "Blocked"); fetchData(); };
+
+  // File Upload
+  const handleFileUpload = (e, setItem, field) => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => setItem(prev => ({ ...prev, [field]: reader.result }));
+    reader.readAsDataURL(file);
   };
 
-  const startEditUser = (user) => {
-    setEditingUserId(user.id);
-    setEditUserData({ email: user.email, password: user.password });
-  };
-
-  const saveEditUser = async () => {
+  // Fetch data helper (can be reused)
+  const fetchData = async () => {
     try {
-      await axios.put(`http://localhost:1000/Admin/${editingUserId}`, editUserData);
-      toast.success("User updated successfully");
-      setEditingUserId(null);
-      fetchData();
+      const [adminRes, postingUserRes, projectRes] = await Promise.all([
+        axios.get("http://localhost:1000/Admin"),
+        axios.get("http://localhost:1000/PostingUsers"),
+        axios.get("http://localhost:1000/project"),
+      ]);
+      setAdmins(adminRes.data);
+      setPostingUsers(postingUserRes.data);
+      setProjects(projectRes.data);
     } catch (err) {
-      toast.error("Failed to update user");
-      console.log(err);
-    }
-  };
-
-  // --- POST ACTIONS ---
-  const handleAddPost = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post("http://localhost:1000/Posts", newPost);
-      toast.success("Service post added!");
-      setNewPost({ title: "", description: "", imageUrl: "" });
-      fetchData();
-    } catch (err) {
-      toast.error("Failed to create post");
-      console.log(err);
-    }
-  };
-
-  const deletePost = async (id) => {
-    if (window.confirm("Remove this service post?")) {
-      await axios.delete(`http://localhost:1000/Posts/${id}`);
-      fetchData();
-    }
-  };
-
-  const startEditPost = (post) => {
-    setEditingPostId(post.id);
-    setEditPostData({ title: post.title, description: post.description, imageUrl: post.imageUrl });
-  };
-
-  const saveEditPost = async () => {
-    try {
-      await axios.put(`http://localhost:1000/Posts/${editingPostId}`, editPostData);
-      toast.success("Service post updated!");
-      setEditingPostId(null);
-      fetchData();
-    } catch (err) {
-      toast.error("Failed to update post");
-      console.log(err);
+      console.error(err);
     }
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-50 font-sans">
+    <div className="flex min-h-screen bg-gray-50 font-sans transition-colors">
       {/* SIDEBAR */}
-      <aside className="w-64 bg-[#002B5B] text-white shadow-xl">
-        <div className="p-6 text-xl font-bold tracking-tight border-b border-white/10">
+      <aside className="w-64 bg-gradient-to-b from-[#002B5B] to-[#001f3b] text-white shadow-xl">
+        <div className="p-6 text-2xl font-bold tracking-tight border-b border-white/20">
           Rehoboth <span className="text-blue-400">Marine</span>
         </div>
-        <nav className="mt-6">
-          <NavItem icon={<LayoutDashboard size={20} />} label="Dashboard" active={view === "dashboard"} onClick={() => setView("dashboard")} />
-          <NavItem icon={<Users size={20} />} label="User Management" active={view === "users"} onClick={() => setView("users")} />
-          <NavItem icon={<FileText size={20} />} label="Post Management" active={view === "posts"} onClick={() => setView("posts")} />
+        <nav className="mt-6 space-y-1">
+          <NavItem icon={<LayoutDashboard size={20} />} label="Dashboard" active={view==="dashboard"} onClick={()=>setView("dashboard")} />
+          <NavItem icon={<Users size={20} />} label="Admin Management" active={view==="admins"} onClick={()=>setView("admins")} />
+          <NavItem icon={<Users size={20} />} label="Posting User Management" active={view==="postingUsers"} onClick={()=>setView("postingUsers")} />
+          <NavItem icon={<FileText size={20} />} label="Project Management" active={view==="projects"} onClick={()=>setView("projects")} />
         </nav>
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 space-y-8">
         {/* DASHBOARD */}
-        {view === "dashboard" && (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-slate-800">Operational Overview</h2>
+        {view==="dashboard" && (
+          <div>
+            <h2 className="text-3xl font-bold text-gray-800 mb-6">Operational Overview</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <StatCard label="Total Admins" value={admins.length} color="border-blue-500"/>
+              <StatCard label="Total Posting Users" value={postingUsers.length} color="border-purple-500"/>
+              <StatCard label="Active Posting Users" value={postingUsers.filter(u=>!u.blocked).length} color="border-green-500"/>
+              <StatCard label="Total Projects" value={projects.length} color="border-yellow-500"/>
+            </div>
+          </div>
+        )}
+
+        {/* ADMIN MANAGEMENT */}
+        {view==="admins" && <ManagementSection title="Admin Management" list={admins} newItem={newAdmin} setNewItem={setNewAdmin} editingId={editingAdminId} editData={editAdminData} setEditData={setEditAdminData} onAdd={handleAddAdmin} onEdit={startEditAdmin} onSave={saveEditAdmin} onDelete={deleteAdmin} fields={["email","password","phone"]} showDocument={true}/>}
+
+        {/* POSTING USER MANAGEMENT */}
+        {view==="postingUsers" && <ManagementSection title="Posting User Management" list={postingUsers} newItem={newPostingUser} setNewItem={setNewPostingUser} editingId={editingPostingUserId} editData={editPostingUserData} setEditData={setEditPostingUserData} onAdd={handleAddPostingUser} onEdit={startEditPostingUser} onSave={saveEditPostingUser} onDelete={deletePostingUser} toggleBlock={toggleBlockUser} fields={["username","password","phone"]} showBlock={true} showDocument={true}/>}
+
+        {/* PROJECT MANAGEMENT */}
+        {view==="projects" && (
+          <div>
+            <h2 className="text-3xl font-bold mb-6 text-gray-800">Projects</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <StatCard label="Total Admins" value={users.length} color="border-blue-500" />
-              <StatCard label="Live Services" value={posts.length} color="border-green-500" />
-            </div>
-          </div>
-        )}
-
-        {/* USER MANAGEMENT */}
-        {view === "users" && (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-slate-800">User Management</h2>
-            <form onSubmit={handleAddUser} className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex gap-4">
-              <input
-                className="flex-1 border p-2 rounded-lg"
-                type="email"
-                placeholder="Admin Email"
-                required
-                value={newUser.email}
-                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-              />
-              <input
-                className="flex-1 border p-2 rounded-lg"
-                type="password"
-                placeholder="Password"
-                required
-                value={newUser.password}
-                onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-              />
-              <button className="bg-[#2563EB] text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
-                <Plus size={16} /> Add Admin
-              </button>
-            </form>
-
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mt-4">
-              <table className="w-full text-left">
-                <thead className="bg-slate-50 font-semibold text-slate-600">
-                  <tr>
-                    <th className="p-4">Email</th>
-                    <th className="p-4 text-center">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((u) => (
-                    <tr key={u.id} className="border-t">
-                      <td className="p-4">
-                        {editingUserId === u.id ? (
-                          <input
-                            className="border p-1 rounded-lg"
-                            value={editUserData.email}
-                            onChange={(e) => setEditUserData({ ...editUserData, email: e.target.value })}
-                          />
-                        ) : (
-                          u.email
-                        )}
-                      </td>
-                      <td className="p-4 text-center flex justify-center gap-2">
-                        {editingUserId === u.id ? (
-                          <>
-                            <button onClick={saveEditUser} className="text-green-500 hover:text-green-700">
-                              Save
-                            </button>
-                            <button onClick={() => setEditingUserId(null)} className="text-gray-500 hover:text-gray-700">
-                              Cancel
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <button onClick={() => startEditUser(u)} className="text-blue-500 hover:text-blue-700 flex items-center gap-1">
-                              <Edit size={14} /> Edit
-                            </button>
-                            <button onClick={() => deleteUser(u.id)} className="text-red-500 hover:text-red-700 flex items-center gap-1">
-                              <Trash2 size={14} /> Delete
-                            </button>
-                          </>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* POST MANAGEMENT */}
-        {view === "posts" && (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-slate-800">Service Post Management</h2>
-            <form onSubmit={handleAddPost} className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  className="border p-2 rounded-lg"
-                  placeholder="Service Title"
-                  value={newPost.title}
-                  onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
-                  required
-                />
-                <input
-                  className="border p-2 rounded-lg"
-                  placeholder="Image URL"
-                  value={newPost.imageUrl}
-                  onChange={(e) => setNewPost({ ...newPost, imageUrl: e.target.value })}
-                  required
-                />
-              </div>
-              <textarea
-                className="w-full border p-2 rounded-lg"
-                placeholder="Service Description"
-                rows="2"
-                value={newPost.description}
-                onChange={(e) => setNewPost({ ...newPost, description: e.target.value })}
-                required
-              />
-              <button className="bg-[#2563EB] text-white px-6 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700">
-                <Plus size={16} /> Add Service
-              </button>
-            </form>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              {posts.map((p) => (
-                <div key={p.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center">
-                  <div className="flex-1">
-                    {editingPostId === p.id ? (
-                      <>
-                        <input
-                          className="border p-1 rounded-lg w-full mb-1"
-                          value={editPostData.title}
-                          onChange={(e) => setEditPostData({ ...editPostData, title: e.target.value })}
-                        />
-                        <input
-                          className="border p-1 rounded-lg w-full mb-1"
-                          value={editPostData.imageUrl}
-                          onChange={(e) => setEditPostData({ ...editPostData, imageUrl: e.target.value })}
-                        />
-                        <textarea
-                          className="border p-1 rounded-lg w-full"
-                          value={editPostData.description}
-                          onChange={(e) => setEditPostData({ ...editPostData, description: e.target.value })}
-                        />
-                      </>
-                    ) : (
-                      <>
-                        <h4 className="font-bold text-slate-800">{p.title}</h4>
-                        <p className="text-xs text-slate-500 truncate w-64">{p.description}</p>
-                      </>
-                    )}
-                  </div>
-                  <div className="flex gap-2 ml-4">
-                    {editingPostId === p.id ? (
-                      <>
-                        <button onClick={saveEditPost} className="text-green-500 hover:text-green-700">
-                          Save
-                        </button>
-                        <button onClick={() => setEditingPostId(null)} className="text-gray-500 hover:text-gray-700">
-                          Cancel
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button onClick={() => startEditPost(p)} className="text-blue-500 hover:text-blue-700 flex items-center gap-1">
-                          <Edit size={16} /> Edit
-                        </button>
-                        <button onClick={() => deletePost(p.id)} className="text-red-500 hover:text-red-700 flex items-center gap-1">
-                          <Trash2 size={16} /> Delete
-                        </button>
-                      </>
-                    )}
+              {projects.map(p=>(
+                <div key={p.id} className="bg-white rounded-xl shadow hover:shadow-lg transition-shadow duration-300 border border-gray-200 overflow-hidden">
+                  <img src={p.imageUrl} className="w-full h-48 object-cover"/>
+                  <div className="p-4">
+                    <h3 className="font-bold text-xl text-gray-800">{p.title}</h3>
+                    <p className="text-gray-500 text-sm truncate">{p.shortDescription}</p>
+                    <p className="text-gray-400 text-xs mt-1">{p.status}</p>
                   </div>
                 </div>
               ))}
@@ -310,25 +148,76 @@ function AdminDashboard() {
   );
 }
 
-// --- Helper Components ---
-function NavItem({ icon, label, active, onClick }) {
+// --- NAV ITEM ---
+function NavItem({icon,label,active,onClick}){
   return (
-    <button
-      onClick={onClick}
-      className={`w-full flex items-center p-4 transition-all ${active ? "bg-[#2563EB] text-white" : "text-slate-300 hover:bg-white/5 hover:text-white"}`}
-    >
+    <button onClick={onClick} className={`w-full flex items-center p-4 rounded-lg transition-all duration-200 ${active?"bg-[#2563EB] text-white":"text-gray-300 hover:bg-white/10 hover:text-white"}`}>
       <span className="mr-3">{icon}</span> {label}
     </button>
-  );
+  )
 }
 
-function StatCard({ label, value, color }) {
+// --- STAT CARD ---
+function StatCard({label,value,color}){
   return (
-    <div className={`bg-white p-6 rounded-2xl shadow-sm border-l-8 ${color}`}>
-      <p className="text-slate-500 text-sm font-semibold uppercase">{label}</p>
-      <p className="text-4xl font-bold text-slate-800 mt-1">{value}</p>
+    <div className={`bg-white p-6 rounded-2xl shadow hover:shadow-lg transition-shadow duration-300 border-l-8 ${color}`}>
+      <p className="text-gray-500 text-sm font-semibold uppercase">{label}</p>
+      <p className="text-4xl font-bold text-gray-800 mt-2">{value}</p>
     </div>
-  );
+  )
+}
+
+// --- MANAGEMENT SECTION ---
+function ManagementSection({title,list,newItem,setNewItem,editingId,editData,setEditData,onAdd,onEdit,onSave,onDelete,toggleBlock,fields,showBlock=false,showDocument=false}){
+  const handleFileUpload=(e,setItem,field)=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onloadend=()=>setItem(prev=>({...prev,[field]:reader.result}));reader.readAsDataURL(file);}
+  return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
+      {/* ADD FORM */}
+      <form onSubmit={onAdd} className="bg-white p-6 rounded-xl shadow flex flex-col md:flex-row gap-4 items-center">
+        {fields.map(f=>(<input key={f} type={f==="password"?"password":"text"} placeholder={f.charAt(0).toUpperCase()+f.slice(1)} className="border p-2 rounded-lg flex-1 focus:ring-2 focus:ring-blue-500 outline-none transition duration-200" value={newItem[f]} onChange={e=>setNewItem({...newItem,[f]:e.target.value})} required/>))}
+        {showDocument && <input type="file" accept="image/*,.pdf" onChange={e=>handleFileUpload(e,setNewItem,"documentUrl")} className="border p-2 rounded-lg cursor-pointer"/>}
+        <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center gap-2 shadow hover:shadow-lg transition transform active:scale-95"><Plus size={16}/> Add</button>
+      </form>
+
+      {/* TABLE */}
+      <div className="bg-white rounded-xl shadow border overflow-x-auto">
+        <table className="w-full text-left min-w-[700px]">
+          <thead className="bg-gray-100 font-semibold text-gray-600">
+            <tr>
+              {fields.map(f=><th key={f} className="p-3">{f.charAt(0).toUpperCase()+f.slice(1)}</th>)}
+              {showDocument && <th className="p-3">Document</th>}
+              {showBlock && <th className="p-3">Status</th>}
+              <th className="p-3 text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {list.map(item=>(
+              <tr key={item.id} className="border-t hover:bg-gray-50 transition duration-200">
+                {fields.map(f=><td key={f} className="p-3">{editingId===item.id?<input className="border p-1 rounded-lg w-full" value={editData[f]} onChange={e=>setEditData({...editData,[f]:e.target.value})}/>:item[f]}</td>)}
+                {showDocument && <td className="p-3">{item.documentUrl?<a href={item.documentUrl} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">View</a>:"No document"}</td>}
+                {showBlock && <td className="p-3">{item.blocked?"Blocked":"Active"}</td>}
+                <td className="p-3 flex justify-center gap-2">
+                  {editingId===item.id?(
+                    <>
+                      <button onClick={onSave} className="text-green-500 hover:text-green-700">Save</button>
+                      <button onClick={()=>setEditData({})} className="text-gray-500 hover:text-gray-700">Cancel</button>
+                    </>
+                  ):(
+                    <>
+                      <button onClick={()=>onEdit(item)} className="text-blue-500 hover:text-blue-700 flex items-center gap-1"><Edit size={14}/> Edit</button>
+                      <button onClick={()=>onDelete(item.id)} className="text-red-500 hover:text-red-700 flex items-center gap-1"><Trash2 size={14}/> Delete</button>
+                      {showBlock && <button onClick={()=>toggleBlock(item)} className={`flex items-center gap-1 ${item.blocked?"text-green-600":"text-orange-500"}`}>{item.blocked?<Unlock size={14}/> : <Lock size={14}/>} {item.blocked?"Unblock":"Block"}</button>}
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
 }
 
 export default AdminDashboard;
