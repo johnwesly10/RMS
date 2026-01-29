@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import './App.css';
+import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import "./App.css";
 
 import TopBar from "./components/TopBar";
 import Navbar from "./components/Navbar";
@@ -18,105 +18,96 @@ import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import ServicesMain from "./components/ServicesMain";
 import ContactMain from "./components/ContactMain";
-import OurReach from './components/OurReach';
+import OurReach from "./components/OurReach";
 import Enquiry from "./components/Enquiry";
-<<<<<<< HEAD
+
 import ScrollToTop from "./components/ScrollToTop";
-=======
-import AdminLogin from './components/AdminLogin';
-import AdminDashboard from './components/AdminDashboard';
-import ProjectUpload from './components/ProjectUpload';
-import ProjectDetail from './components/ProjectDetail';
-import ProjectGallery from './components/ProjectGallery.jsx'; // A gallery component listing all projects
->>>>>>> 9f14e13 (new update)
+
+import AdminLogin from "./components/AdminLogin";
+import AdminDashboard from "./components/AdminDashboard";
+import ProjectUpload from "./components/ProjectUpload";
+import ProjectDetail from "./components/ProjectDetail";
+import ProjectGallery from "./components/ProjectGallery";
 
 function App() {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <Router>
+      <div className="flex flex-col min-h-screen overflow-x-hidden w-full">
         <TopBar />
-        <header className={`sticky top-0 z-50 transition-shadow ${isScrolled ? 'shadow-md' : ''}`}>
+
+        <header
+          className={`sticky top-0 z-50 transition-shadow ${
+            isScrolled ? "shadow-md" : ""
+          }`}
+        >
           <Navbar />
         </header>
 
         <main className="grow">
-<<<<<<< HEAD
           <ScrollToTop>
             <Routes>
-              <Route path="/" element={
-                <>
-                  <Hero />
-                  <Services />
-                  <About />
-                  <Testimonials />
-                  <Contact />
-                </>
-              } />
+              {/* Home */}
+              <Route
+                path="/"
+                element={
+                  <>
+                    <Hero />
+                    <Services />
+                    <About />
+                    <Testimonials />
+                    <Contact />
+                  </>
+                }
+              />
+
+              {/* Services */}
               <Route path="/services" element={<Services />} />
               <Route path="/services/ship-repair" element={<ShipRepair />} />
               <Route path="/services/dry-docking" element={<DryDocking />} />
-              <Route path="/services/marine-electrical" element={<MarineElectrical />} />
-              <Route path="/services/marine-automation" element={<MarineAutomation />} />
-              <Route path="/services/harbor-services" element={<HarborServices />} />
+              <Route
+                path="/services/marine-electrical"
+                element={<MarineElectrical />}
+              />
+              <Route
+                path="/services/marine-automation"
+                element={<MarineAutomation />}
+              />
+              <Route
+                path="/services/harbor-services"
+                element={<HarborServices />}
+              />
               <Route path="/services/port-agency" element={<PortAgency />} />
+
+              {/* Other pages */}
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/serviceMain" element={<ServicesMain />} />
               <Route path="/contactus" element={<ContactMain />} />
               <Route path="/ourReach" element={<OurReach />} />
               <Route path="/enquiry" element={<Enquiry />} />
+
+              {/* Admin */}
+              <Route path="/admin" element={<AdminLogin />} />
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/project-uploads" element={<ProjectUpload />} />
+
+              {/* Projects */}
+              <Route path="/gallery" element={<ProjectGallery />} />
+              <Route path="/gallery/:id" element={<ProjectDetail />} />
             </Routes>
           </ScrollToTop>
-=======
-          <Routes>
-            {/* Home Page */}
-            <Route path="/" element={
-              <>
-                <Hero />
-                <Services />
-                <About />
-                <Testimonials />
-                <Contact />
-              </>
-            } />
-
-            {/* Services Pages */}
-            <Route path="/services" element={<Services />} />
-            <Route path="/services/ship-repair" element={<ShipRepair />} />
-            <Route path="/services/dry-docking" element={<DryDocking />} />
-            <Route path="/services/marine-electrical" element={<MarineElectrical />} />
-            <Route path="/services/marine-automation" element={<MarineAutomation />} />
-            <Route path="/services/harbor-services" element={<HarborServices />} />
-            <Route path="/services/port-agency" element={<PortAgency />} />
-
-            {/* Other Pages */}
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/serviceMain" element={<ServicesMain />} />
-            <Route path="/contactus" element={<ContactMain />} />
-            <Route path="/OurReach" element={<OurReach />} />
-            <Route path="/enquiry" element={<Enquiry />} />
-
-            {/* Admin Pages */}
-            <Route path="/admin" element={<AdminLogin />} />
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/project-uploads" element={<ProjectUpload />} />
-
-            {/* Project Gallery & Detail Pages */}
-            <Route path="/gallery" element={<ProjectGallery />} />          {/* Public gallery */}
-            <Route path="/gallery/:id" element={<ProjectDetail />} />       {/* Project details */}
-          </Routes>
->>>>>>> 9f14e13 (new update)
         </main>
 
         <Footer />
+      </div>
     </Router>
   );
 }
