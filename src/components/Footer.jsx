@@ -1,4 +1,4 @@
-import { Facebook, Twitter, Instagram, Linkedin, Phone, Mail, MapPin, Clock } from "lucide-react";
+import { Facebook, Twitter, Instagram, Linkedin, Phone, Mail, MapPin, Clock, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import companyLogo from "../assets/company-logo.png";
 
@@ -11,6 +11,7 @@ const Footer = () => {
     { name: "About Us", href: "#about" },
     { name: "Contact", href: "/contact" },
     { name: "Our Reach", href: "/ourReach" },
+    { name: "Admin", href: "/admin/login" },
   ];
 
   const services = [
@@ -71,7 +72,7 @@ const Footer = () => {
 
             {/* Row 2: Quick Links + Services - Side by side on mobile/tablet, separate on desktop */}
             <div className="grid grid-cols-2 gap-6 sm:gap-8 lg:gap-0 lg:col-span-2 lg:grid-cols-2">
-              
+
               {/* Quick Links - Row 2, Column 1 */}
               <div>
                 <h3 className="text-base sm:text-lg font-semibold text-white mb-4 sm:mb-6">Quick Links</h3>

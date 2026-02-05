@@ -6,9 +6,9 @@ import companyName from "../assets/company-name.jpeg";
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "Services", href: "/serviceMain" },
-  { name: "Gallery", href: "/gallery" },
+  { name: "Gallery", href: "#gallery" },
   { name: "Contact Us", href: "/contact" },
-  { name: "Our Reach", href: "/OurReach" },
+  { name: "Our Reach", href: "/ourReach" },
 ];
 
 const Navigation = () => {
@@ -133,6 +133,15 @@ const Navigation = () => {
                   </span>
                 </Link>
               ))}
+              
+              {/* Admin Login Link for Mobile */}
+              <Link
+                to="/admin/login"
+                className="block py-2.5 px-3 sm:py-3 sm:px-4 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-300 text-sm sm:text-base font-medium transform hover:translate-x-2"
+                onClick={() => setIsOpen(false)}
+              >
+                Admin Login
+              </Link>
             </div>
             
             {/* CTA Button */}
