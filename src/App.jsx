@@ -22,6 +22,7 @@ import ContactMain from "./components/ContactMain";
 import OurReach from './components/OurReach';
 import Enquiry from "./components/Enquiry";
 import ScrollToTop from "./components/ScrollToTop";
+import ProjectsGallery from "./components/ProjectsGallery";
 
 // Admin imports
 import Login from './pages/admin/Login';
@@ -97,6 +98,7 @@ function App() {
                     <Route path="serviceMain" element={<ServicesMain />} />
                     <Route path="contactus" element={<ContactMain />} />
                     <Route path="ourReach" element={<OurReach />} />
+                    <Route path="gallery" element={<ProjectsGallery />} />
                     <Route path="enquiry" element={<Enquiry />} />
                   </Routes>
                 </ScrollToTop>

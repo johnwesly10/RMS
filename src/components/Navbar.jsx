@@ -6,7 +6,7 @@ import companyName from "../assets/company-name.jpeg";
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "Services", href: "/serviceMain" },
-  { name: "Gallery", href: "#gallery" },
+  { name: "Gallery", href: "/gallery" },
   { name: "Contact Us", href: "/contact" },
   { name: "Our Reach", href: "/ourReach" },
 ];
