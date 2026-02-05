@@ -8,7 +8,6 @@ import {
 } from '../controllers/projectController.js';
 
 import { authenticate } from '../middleware/auth.js';
-import { authorize } from '../middleware/roleAuth.js';
 import { validateProject, handleValidationErrors } from '../middleware/validation.js';
 import upload from '../middleware/upload.js';
 

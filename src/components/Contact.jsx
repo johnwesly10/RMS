@@ -1,4 +1,4 @@
-import { MapPin, Phone, Mail, Clock, ArrowUpRight } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, ArrowUpRight, CheckCircle, AlertCircle } from "lucide-react";
 import { useState } from "react";
 
 const Contact = () => {
@@ -8,26 +8,66 @@ const Contact = () => {
     phone: "",
     message: ""
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', null
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Debug: Log the change
+    console.log('Field changed:', name, value);
+    
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission
-    console.log("Form submitted:", formData);
-    alert("Thank you for your message. We'll get back to you soon!");
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      message: ""
-    });
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+
+    // Debug: Log form state right before submission
+    console.log('Current form state before submission:', formData);
+    console.log('Submitting form data:', formData);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/contact/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+      
+      // Debug: Log server response
+      console.log('Server response:', data);
+
+      if (data.success) {
+        setSubmitStatus('success');
+        // Reset form after successful submission
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          message: ""
+        });
+      } else {
+        setSubmitStatus('error');
+        console.error('Submission error:', data.message);
+        if (data.errors) {
+          console.error('Validation errors:', data.errors);
+        }
+      }
+    } catch (error) {
+      setSubmitStatus('error');
+      console.error('Network error:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -43,6 +83,28 @@ const Contact = () => {
           {/* Contact Form */}
           <div className="bg-gray-50 p-5 sm:p-6 lg:p-8 rounded-lg shadow-md">
             <h3 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6 text-gray-900">Send us a Message</h3>
+            
+            {/* Status Messages */}
+            {submitStatus === 'success' && (
+              <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center">
+                <CheckCircle className="w-5 h-5 text-green-600 mr-3 flex-shrink-0" />
+                <div>
+                  <p className="text-green-800 font-medium">Message sent successfully!</p>
+                  <p className="text-green-700 text-sm">We'll get back to you soon.</p>
+                </div>
+              </div>
+            )}
+            
+            {submitStatus === 'error' && (
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center">
+                <AlertCircle className="w-5 h-5 text-red-600 mr-3 flex-shrink-0" />
+                <div>
+                  <p className="text-red-800 font-medium">Failed to send message</p>
+                  <p className="text-red-700 text-sm">Please try again later.</p>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div>
@@ -55,6 +117,7 @@ const Contact = () => {
                     onChange={handleChange}
                     className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                     required
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div>
@@ -67,6 +130,7 @@ const Contact = () => {
                     onChange={handleChange}
                     className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                     required
+                    disabled={isSubmitting}
                   />
                 </div>
               </div>
@@ -79,6 +143,7 @@ const Contact = () => {
                   value={formData.phone}
                   onChange={handleChange}
                   className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
+                  disabled={isSubmitting}
                 />
               </div>
               <div>
@@ -91,13 +156,22 @@ const Contact = () => {
                   onChange={handleChange}
                   className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                   required
+                  disabled={isSubmitting}
                 ></textarea>
               </div>
               <button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 sm:py-3 px-4 sm:px-6 rounded-md transition-colors flex items-center justify-center text-sm sm:text-base"
+                disabled={isSubmitting}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2.5 sm:py-3 px-4 sm:px-6 rounded-md transition-colors flex items-center justify-center text-sm sm:text-base disabled:cursor-not-allowed"
               >
-                Send Message
+                {isSubmitting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Sending...
+                  </>
+                ) : (
+                  'Send Message'
+                )}
               </button>
             </form>
           </div>
