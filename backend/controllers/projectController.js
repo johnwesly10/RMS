@@ -7,6 +7,11 @@ export const createProject = async (req, res) => {
       createdBy: req.user._id
     };
 
+    // Add image path if file was uploaded
+    if (req.file) {
+      projectData.image = `/uploads/${req.file.filename}`;
+    }
+
     const project = new Project(projectData);
     await project.save();
 
@@ -109,9 +114,16 @@ export const updateProject = async (req, res) => {
       });
     }
 
+    const updateData = { ...req.body };
+
+    // Add image path if file was uploaded
+    if (req.file) {
+      updateData.image = `/uploads/${req.file.filename}`;
+    }
+
     const updatedProject = await Project.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updateData,
       { new: true, runValidators: true }
     ).populate('createdBy', 'username email role');
 

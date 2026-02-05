@@ -4,15 +4,23 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import connectDB from './config/database.js';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import process from 'process';
 
 import authRoutes from './routes/auth.js';
 import projectRoutes from './routes/projects.js';
 import subAdminRoutes from './routes/subAdmins.js';
 import userRoutes from './routes/users.js';
+import contactRoutes from './routes/contact.js';
 
 dotenv.config();
 
 const app = express();
+
+// Get __dirname equivalent in ES6 modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 connectDB();
 
@@ -36,6 +44,9 @@ app.use(limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Serve static files from uploads directory
+app.use('/uploads', express.static(join(__dirname, 'uploads')));
+
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
@@ -48,6 +59,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/subadmins', subAdminRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/contact', contactRoutes);
 
 app.use('*', (req, res) => {
   res.status(404).json({
@@ -56,7 +68,7 @@ app.use('*', (req, res) => {
   });
 });
 
-app.use((error, req, res, next) => {
+app.use((error, req, res, _next) => {
   console.error('Error:', error);
   
   if (error.name === 'ValidationError') {

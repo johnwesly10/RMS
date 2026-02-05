@@ -11,6 +11,8 @@ const Projects = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -31,6 +33,53 @@ const Projects = () => {
   useEffect(() => {
     fetchProjects();
   }, [searchTerm, statusFilter, pagination.current]);
+
+  const handleEditProject = async () => {
+    // Validate form
+    const errors = {};
+    if (!formData.name.trim()) errors.name = 'Project name is required';
+    if (!formData.description.trim()) errors.description = 'Description is required';
+    if (!formData.client.trim()) errors.client = 'Client name is required';
+    if (!formData.startDate) errors.startDate = 'Start date is required';
+    if (!formData.endDate) errors.endDate = 'End date is required';
+    else if (formData.startDate && formData.endDate && new Date(formData.endDate) <= new Date(formData.startDate)) {
+      errors.endDate = 'End date must be after start date';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Prepare project data for marine project
+      const projectData = {
+        name: formData.name,
+        description: formData.description,
+        status: formData.status,
+        client: formData.client,
+        startDate: new Date(formData.startDate),
+        endDate: new Date(formData.endDate)
+      };
+
+      console.log('Updating project with data:', projectData);
+      
+      await projectAPI.updateProject(editingProject._id, projectData, formData.image);
+      
+      // Reset form and close modal
+      setFormData({ name: '', description: '', status: 'active', client: '', startDate: '', endDate: '', image: null });
+      setFormErrors({});
+      setEditingProject(null);
+      setShowEditModal(false);
+      fetchProjects();
+    } catch (error) {
+      console.error('Failed to update project:', error);
+      setFormErrors({ submit: error.response?.data?.message || error.message || 'Failed to update project' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleAddProject = async () => {
     // Validate form
@@ -57,12 +106,11 @@ const Projects = () => {
         description: formData.description,
         status: formData.status,
         client: formData.client,
-        startDate: formData.startDate,
-        endDate: formData.endDate,
-        image: formData.image ? 'image-uploaded' : null // Placeholder for image handling
+        startDate: new Date(formData.startDate),
+        endDate: new Date(formData.endDate)
       };
 
-      await projectAPI.createProject(projectData);
+      await projectAPI.createProject(projectData, formData.image);
       
       // Reset form and close modal
       setFormData({ name: '', description: '', status: 'active', client: '', startDate: '', endDate: '', image: null });
@@ -71,7 +119,7 @@ const Projects = () => {
       fetchProjects();
     } catch (error) {
       console.error('Failed to create project:', error);
-      setFormErrors({ submit: error.response?.data?.message || 'Failed to create project' });
+      setFormErrors({ submit: error.response?.data?.message || error.message || 'Failed to create project' });
     } finally {
       setIsSubmitting(false);
     }
@@ -140,6 +188,21 @@ const Projects = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEditClick = (project) => {
+    setEditingProject(project);
+    setFormData({
+      name: project.name || '',
+      description: project.description || '',
+      status: project.status || 'active',
+      client: project.client || '',
+      startDate: project.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '',
+      endDate: project.endDate ? new Date(project.endDate).toISOString().split('T')[0] : '',
+      image: null
+    });
+    setFormErrors({});
+    setShowEditModal(true);
   };
 
   const handleDelete = async (projectId) => {
@@ -284,12 +347,11 @@ const Projects = () => {
               </div>
               
               {/* Action Buttons */}
-              <div className="grid grid-cols-3 gap-2">
-                <button className="bg-blue-50 text-blue-600 px-3 py-2 rounded-lg text-sm hover:bg-blue-100 transition-colors flex items-center justify-center group">
-                  <Eye className="w-4 h-4 mr-1 group-hover:scale-110 transition-transform" />
-                  View
-                </button>
-                <button className="bg-gray-50 text-gray-600 px-3 py-2 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center justify-center group">
+              <div className="grid grid-cols-2 gap-2">
+                <button 
+                  onClick={() => handleEditClick(project)}
+                  className="bg-gray-50 text-gray-600 px-3 py-2 rounded-lg text-sm hover:bg-gray-100 transition-colors flex items-center justify-center group"
+                >
                   <Edit className="w-4 h-4 mr-1 group-hover:scale-110 transition-transform" />
                   Edit
                 </button>
@@ -316,7 +378,10 @@ const Projects = () => {
           <p className="text-gray-600 mb-6 max-w-md mx-auto">
             Start managing your maritime operations by creating your first marine project. Track vessel repairs, docking schedules, and more.
           </p>
-          <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center font-medium">
+          <button 
+            onClick={() => setShowAddModal(true)}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center font-medium"
+          >
             <Plus className="w-5 h-5 mr-2" />
             Create Marine Project
           </button>
@@ -349,6 +414,255 @@ const Projects = () => {
               >
                 Next
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Project Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen px-4">
+            {/* Backdrop */}
+            <div 
+              className="fixed inset-0 bg-black transition-opacity"
+              style={{ opacity: 0.3 }}
+              onClick={() => {
+                setShowEditModal(false);
+                setEditingProject(null);
+                setFormData({ name: '', description: '', status: 'active', client: '', startDate: '', endDate: '', image: null });
+                setFormErrors({});
+              }}
+            ></div>
+
+            {/* Modal Panel */}
+            <div className="relative z-10 inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-medium text-gray-900">Edit Marine Project</h3>
+                  <button
+                    onClick={() => {
+                      setShowEditModal(false);
+                      setEditingProject(null);
+                      setFormData({ name: '', description: '', status: 'active', client: '', startDate: '', endDate: '', image: null });
+                      setFormErrors({});
+                    }}
+                    className="text-gray-400 hover:text-gray-500"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
+
+                <form onSubmit={(e) => { e.preventDefault(); handleEditProject(); }}>
+                  <div className="space-y-4">
+                    <div>
+                      <label htmlFor="edit-name" className="block text-sm font-medium text-gray-700 mb-1">
+                        Project Name
+                      </label>
+                      <input
+                        type="text"
+                        id="edit-name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          formErrors.name ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Enter project name"
+                      />
+                      {formErrors.name && (
+                        <p className="mt-1 text-sm text-red-600">{formErrors.name}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label htmlFor="edit-description" className="block text-sm font-medium text-gray-700 mb-1">
+                        Description
+                      </label>
+                      <textarea
+                        id="edit-description"
+                        name="description"
+                        value={formData.description}
+                        onChange={handleInputChange}
+                        rows={3}
+                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          formErrors.description ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Enter project description"
+                      />
+                      {formErrors.description && (
+                        <p className="mt-1 text-sm text-red-600">{formErrors.description}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label htmlFor="edit-client" className="block text-sm font-medium text-gray-700 mb-1">
+                        Client Name
+                      </label>
+                      <input
+                        type="text"
+                        id="edit-client"
+                        name="client"
+                        value={formData.client}
+                        onChange={handleInputChange}
+                        className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          formErrors.client ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Enter client name"
+                      />
+                      {formErrors.client && (
+                        <p className="mt-1 text-sm text-red-600">{formErrors.client}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label htmlFor="edit-image" className="block text-sm font-medium text-gray-700 mb-1">
+                        Project Image
+                      </label>
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-4">
+                          <label className="flex-1 cursor-pointer">
+                            <input
+                              type="file"
+                              id="edit-image"
+                              name="image"
+                              accept="image/*"
+                              onChange={handleImageChange}
+                              className="hidden"
+                            />
+                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-500 transition-colors">
+                              <div className="flex flex-col items-center">
+                                <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-2">
+                                  <Plus className="w-6 h-6 text-blue-600" />
+                                </div>
+                                <p className="text-sm text-gray-600">Click to upload new image</p>
+                                <p className="text-xs text-gray-500 mt-1">JPEG, PNG, GIF, WebP (max 5MB)</p>
+                              </div>
+                            </div>
+                          </label>
+                        </div>
+                        
+                        {formData.image && (
+                          <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                            <div className="shrink-0">
+                              <img
+                                src={URL.createObjectURL(formData.image)}
+                                alt="Preview"
+                                className="w-16 h-16 object-cover rounded-lg"
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-900 truncate">
+                                {formData.image.name}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {(formData.image.size / 1024 / 1024).toFixed(2)} MB
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={handleRemoveImage}
+                              className="shrink-0 text-red-600 hover:text-red-800"
+                            >
+                              <X className="w-5 h-5" />
+                            </button>
+                          </div>
+                        )}
+                        
+                        {formErrors.image && (
+                          <p className="mt-1 text-sm text-red-600">{formErrors.image}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label htmlFor="edit-startDate" className="block text-sm font-medium text-gray-700 mb-1">
+                          Start Date
+                        </label>
+                        <input
+                          type="date"
+                          id="edit-startDate"
+                          name="startDate"
+                          value={formData.startDate}
+                          onChange={handleInputChange}
+                          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            formErrors.startDate ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        />
+                        {formErrors.startDate && (
+                          <p className="mt-1 text-sm text-red-600">{formErrors.startDate}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label htmlFor="edit-endDate" className="block text-sm font-medium text-gray-700 mb-1">
+                          End Date
+                        </label>
+                        <input
+                          type="date"
+                          id="edit-endDate"
+                          name="endDate"
+                          value={formData.endDate}
+                          onChange={handleInputChange}
+                          className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                            formErrors.endDate ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                        />
+                        {formErrors.endDate && (
+                          <p className="mt-1 text-sm text-red-600">{formErrors.endDate}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label htmlFor="edit-status" className="block text-sm font-medium text-gray-700 mb-1">
+                        Status
+                      </label>
+                      <select
+                        id="edit-status"
+                        name="status"
+                        value={formData.status}
+                        onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                        <option value="on-hold">On Hold</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                    </div>
+
+                    {formErrors.submit && (
+                      <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg text-sm">
+                        {formErrors.submit}
+                      </div>
+                    )}
+                  </div>
+                </form>
+              </div>
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  onClick={handleEditProject}
+                  disabled={isSubmitting}
+                  className="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? 'Updating...' : 'Update Project'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setEditingProject(null);
+                    setFormData({ name: '', description: '', status: 'active', client: '', startDate: '', endDate: '', image: null });
+                    setFormErrors({});
+                  }}
+                  className="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         </div>

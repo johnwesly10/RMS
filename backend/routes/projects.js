@@ -6,18 +6,39 @@ import {
   updateProject,
   deleteProject
 } from '../controllers/projectController.js';
+
 import { authenticate } from '../middleware/auth.js';
-import { authorize } from '../middleware/roleAuth.js';
 import { validateProject, handleValidationErrors } from '../middleware/validation.js';
+import upload from '../middleware/upload.js';
 
 const router = express.Router();
 
-router.use(authenticate);
-
-router.post('/', validateProject, handleValidationErrors, createProject);
+// -------- PUBLIC ROUTES (No Authentication Required) --------
 router.get('/', getProjects);
 router.get('/:id', getProject);
-router.put('/:id', validateProject, handleValidationErrors, updateProject);
+
+// -------- PROTECTED ROUTES (Authentication Required) --------
+router.use(authenticate);
+
+// Create project with image upload + validation
+router.post(
+  '/',
+  upload.single('image'),
+  validateProject,
+  handleValidationErrors,
+  createProject
+);
+
+// Update project with image upload + validation
+router.put(
+  '/:id',
+  upload.single('image'),
+  validateProject,
+  handleValidationErrors,
+  updateProject
+);
+
+// Delete project
 router.delete('/:id', deleteProject);
 
 export default router;
