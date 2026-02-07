@@ -138,7 +138,7 @@ export const submitContact = async (req, res) => {
 
       const mailOptions = {
         from: `"${process.env.EMAIL_FROM_NAME || 'Website Contact'}" <${process.env.EMAIL_USER}>`,
-        to: 'weslywesly590@gmail.com',
+        to: 'dovin479@gmail.com',
         replyTo: email, // Use sender's email as reply-to
         subject: `New Contact Form Message from ${name}`,
         html: emailContent,
