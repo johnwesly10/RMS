@@ -9,7 +9,7 @@ const ProjectsGallery = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('completed');
+  const [statusFilter, setStatusFilter] = useState('');
   const [selectedProject, setSelectedProject] = useState(null);
   const [pagination, setPagination] = useState({
     current: 1,
@@ -26,11 +26,11 @@ const ProjectsGallery = () => {
       setLoading(true);
       const params = {
         page: pagination.current,
-        limit: 12, // Gallery grid layout
-        status: statusFilter || 'completed'
+        limit: 12
       };
       
       if (searchTerm) params.search = searchTerm;
+      if (statusFilter) params.status = statusFilter;
 
       const response = await projectAPI.getProjects(params);
       setProjects(response.data.projects || []);
@@ -124,11 +124,11 @@ const ProjectsGallery = () => {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
+                <option value="">All Projects</option>
                 <option value="completed">Completed Projects</option>
                 <option value="active">Active Operations</option>
                 <option value="on-hold">On Hold</option>
                 <option value="cancelled">Cancelled</option>
-                <option value="">All Projects</option>
               </select>
             </div>
           </div>
@@ -146,7 +146,7 @@ const ProjectsGallery = () => {
               <div className="relative h-48 bg-linear-to-br from-blue-100 to-cyan-100 rounded-xl overflow-hidden">
                 {project.image ? (
                   <img 
-                    src={project.image} 
+                    src={project.image.startsWith('data:') ? project.image : `http://localhost:5000${project.image}`} 
                     alt={project.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
@@ -290,7 +290,7 @@ const ProjectsGallery = () => {
                     <div className="relative h-64 bg-linear-to-br from-blue-100 to-cyan-100 rounded-xl overflow-hidden mb-6">
                       {selectedProject.image ? (
                         <img 
-                          src={selectedProject.image} 
+                          src={selectedProject.image.startsWith('data:') ? selectedProject.image : `http://localhost:5000${selectedProject.image}`} 
                           alt={selectedProject.name}
                           className="w-full h-full object-cover"
                         />

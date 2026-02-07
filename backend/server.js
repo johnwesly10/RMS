@@ -33,7 +33,9 @@ const limiter = rateLimit({
   }
 });
 
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
    ? ['http://localhost:5173'] 
@@ -44,8 +46,7 @@ app.use(limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from uploads directory
-app.use('/uploads', express.static(join(__dirname, 'uploads')));
+// Static file serving removed - images now stored in database as Base64
 
 app.get('/api/health', (req, res) => {
   res.json({

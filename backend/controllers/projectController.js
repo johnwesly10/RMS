@@ -1,16 +1,39 @@
 import Project from '../models/Project.js';
+import fs from 'fs';
+import path from 'path';
 
 export const createProject = async (req, res) => {
   try {
+    console.log('Create project request received');
+    console.log('Request body:', req.body);
+    console.log('Request file:', req.file);
+    
     const projectData = {
       ...req.body,
       createdBy: req.user._id
     };
 
-    // Add image path if file was uploaded
+    console.log('Project data before image processing:', projectData);
+
+    // Convert uploaded file to Base64 and store in database
     if (req.file) {
-      projectData.image = `/uploads/${req.file.filename}`;
+      try {
+        console.log('Processing uploaded file...');
+        const filePath = req.file.path; // Already absolute path from multer
+        const fileData = fs.readFileSync(filePath);
+        const base64Image = `data:${req.file.mimetype};base64,${fileData.toString('base64')}`;
+        projectData.image = base64Image;
+        
+        // Clean up the temporary file
+        fs.unlinkSync(filePath);
+        console.log('File processed and deleted successfully');
+      } catch (fileError) {
+        console.error('Error processing uploaded file:', fileError);
+        // Continue without image if file processing fails
+      }
     }
+
+    console.log('Project data after image processing:', projectData);
 
     const project = new Project(projectData);
     await project.save();
@@ -23,6 +46,7 @@ export const createProject = async (req, res) => {
       data: { project }
     });
   } catch (error) {
+    console.error('Detailed error in createProject:', error);
     res.status(500).json({
       success: false,
       message: 'Server error creating project',
@@ -44,9 +68,9 @@ export const getProjects = async (req, res) => {
     
     if (search) {
       query.$or = [
-        { title: { $regex: search, $options: 'i' } },
+        { name: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } },
-        { technologies: { $in: [new RegExp(search, 'i')] } }
+        { client: { $regex: search, $options: 'i' } }
       ];
     }
 
@@ -116,9 +140,20 @@ export const updateProject = async (req, res) => {
 
     const updateData = { ...req.body };
 
-    // Add image path if file was uploaded
+    // Convert uploaded file to Base64 and store in database
     if (req.file) {
-      updateData.image = `/uploads/${req.file.filename}`;
+      try {
+        const filePath = req.file.path; // Already absolute path from multer
+        const fileData = fs.readFileSync(filePath);
+        const base64Image = `data:${req.file.mimetype};base64,${fileData.toString('base64')}`;
+        updateData.image = base64Image;
+        
+        // Clean up the temporary file
+        fs.unlinkSync(filePath);
+      } catch (fileError) {
+        console.error('Error processing uploaded file:', fileError);
+        // Continue without image if file processing fails
+      }
     }
 
     const updatedProject = await Project.findByIdAndUpdate(

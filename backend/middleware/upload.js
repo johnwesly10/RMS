@@ -1,19 +1,51 @@
 import multer from 'multer';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Configure storage for uploaded files
+// Clean up old temp files on startup
+const cleanupTempFiles = () => {
+  const tempDir = join(__dirname, '../temp');
+  if (fs.existsSync(tempDir)) {
+    fs.readdir(tempDir, (err, files) => {
+      if (err) return;
+      
+      files.forEach(file => {
+        const filePath = join(tempDir, file);
+        fs.unlink(filePath, () => {}); // Async delete, ignore errors
+      });
+    });
+  }
+};
+
+// Run cleanup on module load
+cleanupTempFiles();
+
+// Configure storage for uploaded files (temporary storage for Base64 conversion)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, join(__dirname, '../uploads'));
+    const tempDir = join(__dirname, '../temp');
+    
+    // Ensure temp directory exists
+    if (!fs.existsSync(tempDir)) {
+      try {
+        fs.mkdirSync(tempDir, { recursive: true });
+        console.log('Created temp directory:', tempDir);
+      } catch (error) {
+        console.error('Failed to create temp directory:', error);
+        return cb(error);
+      }
+    }
+    
+    cb(null, tempDir);
   },
   filename: (req, file, cb) => {
     // Generate unique filename with timestamp
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'project-' + uniqueSuffix + '-' + file.originalname);
+    cb(null, 'temp-' + uniqueSuffix + '-' + file.originalname);
   }
 });
 

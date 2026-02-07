@@ -33,7 +33,7 @@ const projectSchema = new mongoose.Schema({
     default: 'active'
   },
   image: {
-    type: String, // Will store image URL or file path
+    type: String, // Will store Base64 image data
     trim: true
   },
   createdBy: {
