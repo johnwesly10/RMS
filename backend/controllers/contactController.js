@@ -1,7 +1,8 @@
 import Contact from '../models/Contact.js';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
-import process from 'process';
+
+/* global process */
 
 dotenv.config();
 
@@ -23,8 +24,6 @@ export const submitContact = async (req, res) => {
   try {
     const { name, email, phone, message } = req.body;
 
-    // Debug: Log received data
-    console.log('Received contact data:', { name, email, phone, message });
 
     // Basic validation
     const errors = {};
@@ -38,10 +37,6 @@ export const submitContact = async (req, res) => {
       errors.message = 'Message must be at least 10 characters long';
     }
 
-    // Debug: Log validation errors
-    if (Object.keys(errors).length > 0) {
-      console.log('Validation errors:', errors);
-    }
 
     if (Object.keys(errors).length > 0) {
       return res.status(400).json({
@@ -143,7 +138,7 @@ export const submitContact = async (req, res) => {
 
       const mailOptions = {
         from: `"${process.env.EMAIL_FROM_NAME || 'Website Contact'}" <${process.env.EMAIL_USER}>`,
-        to: 'anujokkin@gmail.com',
+        to: 'weslywesly590@gmail.com',
         replyTo: email, // Use sender's email as reply-to
         subject: `New Contact Form Message from ${name}`,
         html: emailContent,
